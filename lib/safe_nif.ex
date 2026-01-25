@@ -17,7 +17,7 @@ defmodule SafeNIF do
   The current node remains isolated, and results are communicated between the two via Erlang Distribution.
 
   Since this uses Erlang Distribution under the hood, it requires that the current node be alive. If the current
-  node is not alive, it will be started with a random name (prefixed with the atom `:my_node`) using `:peer.random_name/1`.
+  node is not alive, an error of `{:error, :not_alive}` will be returned.
 
   The result of the function is emitted wrapped in an `:ok` tuple. This mirrors `Task.async_stream/5`, which always emits
   an `:ok` tuple wrapping the result of running the function value regardless of if the return value is an error.
@@ -29,11 +29,14 @@ defmodule SafeNIF do
   """
   @spec wrap(runnable(), timeout()) :: {:ok, term()} | {:error, term()}
   def wrap(runnable, timeout \\ to_timeout(second: 5)) do
-    if not Node.alive?() do
-      my_node = :peer.random_name(:my_node)
-      Node.start(my_node)
+    if Node.alive?() do
+      do_wrap(runnable, timeout)
+    else
+      {:error, :not_alive}
     end
+  end
 
+  defp do_wrap(runnable, timeout) do
     ref = make_ref()
     caller = self()
 
