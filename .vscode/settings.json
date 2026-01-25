@@ -1,0 +1,3 @@
+{
+  "lexical.server.releasePathOverride": "./priv/expert/start_expert.sh"
+}
