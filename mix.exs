@@ -73,6 +73,8 @@ defmodule SafeNIF.MixProject do
 
   defp deps do
     [
+      # Core Dependencies
+      {:telemetry, "~> 1.0"},
       ## Testing and Development Dependencies
       {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
       {:styler, "~> 1.10", only: [:dev, :test], runtime: false},

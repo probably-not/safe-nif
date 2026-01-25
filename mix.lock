@@ -20,4 +20,5 @@
   "remixed_remix": {:hex, :remixed_remix, "2.0.2", "17305cc2219193c5c443fb5e59e7c67e77a70a80db55fa95068355c0de3bd575", [:mix], [], "hexpm", "2d73083e2e1ad31f742275323c4ad3c184924932346721447e8e5905326a99c4"},
   "statistex": {:hex, :statistex, "1.1.0", "7fec1eb2f580a0d2c1a05ed27396a084ab064a40cfc84246dbfb0c72a5c761e5", [:mix], [], "hexpm", "f5950ea26ad43246ba2cce54324ac394a4e7408fdcf98b8e230f503a0cba9cf5"},
   "styler": {:hex, :styler, "1.10.1", "9229050c978bfaaab1d94e8673843576d0127d48fe64824a30babde3d6342475", [:mix], [], "hexpm", "d86cbcc70e8ab424393af313d1d885931ba9dc7c383d7dd30f4ab255a8d39f73"},
+  "telemetry": {:hex, :telemetry, "1.3.0", "fedebbae410d715cf8e7062c96a1ef32ec22e764197f70cda73d82778d61e7a2", [:rebar3], [], "hexpm", "7015fc8919dbe63764f4b4b87a95b7c0996bd539e0d499be6ec9d7f3875b79e6"},
 }
