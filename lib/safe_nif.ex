@@ -55,11 +55,11 @@ defmodule SafeNIF do
         Process.demonitor(monitor_ref, [:flush])
         {:ok, result}
 
-      {:DOWN, ^ref, :process, ^pid, reason} ->
+      {:DOWN, ^monitor_ref, :process, ^pid, reason} ->
         {:error, reason}
     after
       timeout ->
-        Process.demonitor(ref, [:flush])
+        Process.demonitor(monitor_ref, [:flush])
         Process.exit(pid, :kill)
         {:error, :timeout}
     end
