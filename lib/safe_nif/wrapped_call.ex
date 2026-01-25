@@ -8,12 +8,12 @@ defmodule SafeNIF.WrappedCall do
     end
   end
 
-  def call(pid, {mod, fun, args}) when is_atom(mod) and is_list(args) and is_function(fun, length(args)) do
+  def call(pid, {mod, fun, args}) when is_atom(mod) and is_atom(fun) and is_list(args) do
     {__MODULE__, :wrapped, [pid, mod, fun, args]}
   end
 
   @doc false
-  def wrapped(pid, mod, fun, args) when is_atom(mod) and is_list(args) and is_function(fun, length(args)) do
+  def wrapped(pid, mod, fun, args) when is_atom(mod) and is_atom(fun) and is_list(args) do
     result = apply(mod, fun, args)
     send(pid, {:ok, result})
   end

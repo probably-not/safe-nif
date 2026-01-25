@@ -7,10 +7,9 @@ defmodule SafeNIF.Runner do
   defguardp is_runnable(runnable)
             when is_function(runnable, 0) or
                    (is_tuple(runnable) and
-                      is_atom(
-                        elem(runnable, 0) and is_list(elem(runnable, 2)) and
-                          is_function(elem(runnable, 1), length(elem(runnable, 2)))
-                      ))
+                      is_atom(elem(runnable, 0)) and
+                      is_atom(elem(runnable, 1)) and
+                      is_list(elem(runnable, 2)))
 
   def start_link({ref, runnable, caller} = init_arg)
       when is_reference(ref) and is_runnable(runnable) and is_pid(caller) do
