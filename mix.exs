@@ -1,7 +1,7 @@
 defmodule SafeNIF.MixProject do
   use Mix.Project
 
-  @version "0.0.0-rc.0"
+  @version "0.0.0-rc.1"
   @source_url "https://github.com/probably-not/safe-nif"
   @homepage_url @source_url
 
