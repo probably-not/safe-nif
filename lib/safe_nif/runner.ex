@@ -18,7 +18,6 @@ defmodule SafeNIF.Runner do
 
   @impl true
   def init({ref, runnable, caller}) do
-    Process.flag(:trap_exit, true)
     {:ok, {ref, runnable, caller}, {:continue, :startup}}
   end
 
@@ -63,7 +62,7 @@ defmodule SafeNIF.Runner do
   @impl true
   def handle_info({:DOWN, _ref, :process, _pid, reason}, {ref, _, _runnable, caller} = state) do
     send(caller, {ref, {:error, reason}})
-    {:stop, reason, state}
+    {:stop, {:shutdown, reason}, state}
   end
 
   def load_code_on_peer(peer) do
