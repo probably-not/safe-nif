@@ -12,6 +12,7 @@ defmodule SafeNIF.MixProject do
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_path(Mix.env()),
+      compilers: compilers(Mix.env()),
       deps: deps(),
       name: "SafeNIF",
       description:
@@ -61,6 +62,9 @@ defmodule SafeNIF.MixProject do
   defp elixirc_path(:dev), do: ["lib/", "test/support", "bench/"]
   defp elixirc_path(_), do: ["lib/"]
 
+  defp compilers(env) when env in [:test, :dev], do: [:elixir_make] ++ Mix.compilers()
+  defp compilers(_), do: Mix.compilers()
+
   def application do
     [
       extra_applications: applications(Mix.env()),
@@ -76,6 +80,7 @@ defmodule SafeNIF.MixProject do
       # Core Dependencies
       {:telemetry, "~> 1.0"},
       ## Testing and Development Dependencies
+      {:elixir_make, "~> 0.4", only: [:dev, :test], runtime: false},
       {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
       {:styler, "~> 1.10", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40.0", only: :dev, runtime: false},
