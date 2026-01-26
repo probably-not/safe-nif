@@ -20,7 +20,7 @@ Wrap your untrusted NIFs so that they can never crash your node.
 
 ## Benchmarks
 
-Benchmarks can be found in the [`bench`](./bench/) directory. As of v0.1.0, SafeNIF has not implemented pooling of peer nodes.
+Benchmarks can be found in the `bench` directory. As of v0.1.0, SafeNIF has not implemented pooling of peer nodes.
 This means that it currently incurs the high cost of starting up a peer node for every call, which can take anywhere from 100ms to over a second,
 depending on how much code needs to be loaded onto the peer node. You can see from the benchmarks that out of the three methods benchmarked (CLI+Port, NIF, SafeNIF),
 SafeNIF is currently the slowest due to this incurred cost.
