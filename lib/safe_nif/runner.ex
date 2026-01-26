@@ -67,7 +67,7 @@ defmodule SafeNIF.Runner do
 
   def load_code_on_peer(peer) do
     add_code_paths(peer)
-    load_apps_and_transfer_configuration(peer, %{})
+    transfer_configuration(peer)
     ensure_apps_started(peer)
   end
 
@@ -83,17 +83,13 @@ defmodule SafeNIF.Runner do
     rpc(node, :code, :add_paths, [:code.get_path()])
   end
 
-  defp load_apps_and_transfer_configuration(node, override_configs) do
-    Enum.each(Application.started_applications(), fn {app_name, _, _} ->
+  defp transfer_configuration(node) do
+    Enum.each(Application.loaded_applications(), fn {app_name, _, _} ->
       app_name
       |> Application.get_all_env()
       |> Enum.each(fn {key, primary_config} ->
         rpc(node, Application, :put_env, [app_name, key, primary_config, [persistent: true]])
       end)
-    end)
-
-    Enum.each(override_configs, fn {app_name, key, val} ->
-      rpc(node, Application, :put_env, [app_name, key, val, [persistent: true]])
     end)
   end
 
