@@ -3,6 +3,7 @@ local-experiments/
 priv/plts
 priv/expert/bin
 priv/test_nif.so
+priv/test_port
 
 # The directory Mix will write compiled artifacts to.
 /_build/
