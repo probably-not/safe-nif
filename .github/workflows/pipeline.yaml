@@ -119,5 +119,7 @@ jobs:
             priv/plts
       - name: Run Dialyzer
         run: mix dialyzer --format github
+      - name: Start EPMD for tests
+        run: epmd -daemon
       - name: Run tests
         run: mix test
