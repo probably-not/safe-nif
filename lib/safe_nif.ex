@@ -6,7 +6,7 @@ defmodule SafeNIF do
   alias SafeNIF.Runner
 
   @typedoc """
-  Anything that is runnable. This may be a function, or an MFA that can be used in `apply/3`.
+  Anything that is runnable. This may be a function, or an MFA tuple.
   """
   @type runnable() :: (-> term()) | {module(), atom(), list()}
 
@@ -31,6 +31,22 @@ defmodule SafeNIF do
   def wrap(runnable, timeout \\ to_timeout(second: 5)) do
     if Node.alive?() do
       do_wrap(runnable, timeout)
+    else
+      {:error, :not_alive}
+    end
+  end
+
+  @doc """
+  Wrap a call in a way that will ensure that it cannot affect the current BEAM node.
+
+  Like `wrap/1` but accepts an MFA that will be used with `apply/3`.
+
+  See `wrap/1` for more details.
+  """
+  @spec wrap(module(), atom(), list(), timeout()) :: {:ok, term()} | {:error, term()}
+  def wrap(mod, fun, args, timeout \\ to_timeout(second: 5)) when is_atom(mod) and is_atom(fun) and is_list(args) do
+    if Node.alive?() do
+      do_wrap({mod, fun, args}, timeout)
     else
       {:error, :not_alive}
     end
