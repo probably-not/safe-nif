@@ -68,4 +68,12 @@ defmodule SafeNIFTest.TestNIF do
   def safe_add(_a, _b) do
     :erlang.nif_error(:nif_not_loaded)
   end
+
+  @doc """
+  Echoes binary data back - for payload size benchmarks.
+  """
+  @spec safe_echo(binary()) :: binary()
+  def safe_echo(_data) do
+    :erlang.nif_error(:nif_not_loaded)
+  end
 end

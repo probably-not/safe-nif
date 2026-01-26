@@ -68,13 +68,26 @@ safe_add(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_int(env, a + b);
 }
 
+// Echo binary data back - for payload size benchmarks
+static ERL_NIF_TERM
+safe_echo(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    ErlNifBinary bin;
+    if (!enif_inspect_binary(env, argv[0], &bin)) {
+        return enif_make_badarg(env);
+    }
+    // Return the same binary (no copy needed, just return the term)
+    return argv[0];
+}
+
 static ErlNifFunc nif_funcs[] = {
     {"crash_segfault", 0, crash_segfault},
     {"crash_abort", 0, crash_abort},
     {"crash_stack_overflow", 0, crash_stack_overflow},
     {"crash_div_zero", 0, crash_div_zero},
     {"safe_noop", 0, safe_noop},
-    {"safe_add", 2, safe_add}
+    {"safe_add", 2, safe_add},
+    {"safe_echo", 1, safe_echo}
 };
 
 ERL_NIF_INIT(Elixir.SafeNIFTest.TestNIF, nif_funcs, NULL, NULL, NULL, NULL)
