@@ -51,9 +51,13 @@ defmodule SafeNIF do
     monitor_ref = Process.monitor(pid)
 
     receive do
-      {^ref, result} ->
+      {^ref, :completed, result} ->
         Process.demonitor(monitor_ref, [:flush])
         {:ok, result}
+
+      {^ref, :crashed, {:error, result}} ->
+        Process.demonitor(monitor_ref, [:flush])
+        {:error, result}
 
       {:DOWN, ^monitor_ref, :process, ^pid, reason} ->
         {:error, reason}

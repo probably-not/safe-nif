@@ -55,13 +55,13 @@ defmodule SafeNIF.Runner do
   @impl true
   def handle_info({:ok, result}, {ref, monitor_ref, _runnable, caller} = state) do
     Process.demonitor(monitor_ref, [:flush])
-    send(caller, {ref, result})
+    send(caller, {ref, :completed, result})
     {:stop, :normal, state}
   end
 
   @impl true
   def handle_info({:DOWN, _ref, :process, _pid, reason}, {ref, _, _runnable, caller} = state) do
-    send(caller, {ref, {:error, reason}})
+    send(caller, {ref, :crashed, {:error, reason}})
     {:stop, {:shutdown, reason}, state}
   end
 
