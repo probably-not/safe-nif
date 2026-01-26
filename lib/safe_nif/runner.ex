@@ -24,7 +24,7 @@ defmodule SafeNIF.Runner do
   @impl true
   def handle_continue(:startup, state) do
     node_name = :peer.random_name()
-    :peer.start_link(%{name: node_name, wait_boot: {self(), :peer_ready}})
+    :peer.start_link(%{name: node_name, wait_boot: {self(), :peer_ready}, args: [~c"-hidden"]})
     {:noreply, state}
   end
 
