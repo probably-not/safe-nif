@@ -30,7 +30,7 @@ defmodule SafeNIF.Pool do
   def start_link(opts \\ []) do
     pool_size = Keyword.get(opts, :size, System.schedulers_online())
     idle_timeout = Keyword.get(opts, :idle_timeout, @default_idle_timeout)
-    name = Keyword.get(opts, :name, __MODULE__)
+    name = Keyword.fetch!(opts, :name)
 
     NimblePool.start_link(
       worker: {__MODULE__, opts},
