@@ -17,7 +17,6 @@ defmodule SafeNIF.Pool do
     __MODULE__.Default
   end
 
-  @default_pool_size System.schedulers_online()
   @default_idle_timeout to_timeout(minute: 5)
 
   def child_spec(opts) do
@@ -29,7 +28,7 @@ defmodule SafeNIF.Pool do
   end
 
   def start_link(opts \\ []) do
-    pool_size = Keyword.get(opts, :size, @default_pool_size)
+    pool_size = Keyword.get(opts, :size, System.schedulers_online())
     idle_timeout = Keyword.get(opts, :idle_timeout, @default_idle_timeout)
     name = Keyword.get(opts, :name, __MODULE__)
 
