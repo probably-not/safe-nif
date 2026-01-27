@@ -5,7 +5,7 @@ defmodule SafeNIF.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [{SafeNIF.Pool, name: SafeNIF.Pool.default_pool_name()}]
+    children = [{SafeNIF, name: SafeNIF.Pool.default_pool_name()}]
     opts = [strategy: :one_for_one, name: SafeNIF.Supervisor]
     Supervisor.start_link(children, opts)
   end
