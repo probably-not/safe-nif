@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1] - 2026-01-27
+
+Minor fixes to the documentation.
+
+This release doesn't change anything with regards to functionality, but I realized that I left moduledocs on the bench and test modules which were then placed into HexDocs.
+This release is simply to make those all false, and fix up the HexDocs functionality.
+
 ## [0.1.0] - 2026-01-26
 
 Initial release.
