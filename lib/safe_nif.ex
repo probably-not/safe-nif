@@ -8,7 +8,31 @@ defmodule SafeNIF do
   """
   @type runnable() :: (-> term()) | {module(), atom(), list()}
 
+  @typedoc """
+  Options to pass into `wrap/1` or `wrap/4`.
+
+  ## Options
+
+    * `:timeout` - A timeout to be passed into the function, defaulting to 5 seconds.
+      Should the function take longer than the given timeout the underlying process
+      will be force killed and `{:error, :timeout}` will be returned.
+    * `:pool` - A pool configured with custom values for size and idle node time.
+      Defaults to the default pool started up with the application.
+    * `:pool_timeout` - A timeout for how long it should take to checkout a node from the pool, defaulting to 5 seconds.
+      Should the pool checkout take longer than the given timeout `{:error, :timeout}` will be returned.
+  """
   @type wrap_opt() :: {:timeout, timeout()} | {:pool_timeout, timeout()} | {:pool, atom()}
+
+  @typedoc """
+  Options to pass into a new pool when adding it to the supervision tree.
+
+  ## Options
+
+    * `:name` (**required**) - An `t:atom/0` name to give to the pool.
+    * `:size` - How many workers to put in the pool. Defaults to `System.schedulers_online/0`.
+    * `:idle_timeout` - How long to allow the pool and nodes to be idle until we start scaling them down.
+  """
+  @type pool_start_opt() :: {:name, atom()} | {:size, pos_integer()} | {:idle_timeout, timeout()}
 
   @doc false
   defdelegate child_spec(args), to: SafeNIF.Pool
@@ -36,6 +60,24 @@ defmodule SafeNIF do
       Defaults to the default pool started up with the application.
     * `:pool_timeout` - A timeout for how long it should take to checkout a node from the pool, defaulting to 5 seconds.
       Should the pool checkout take longer than the given timeout `{:error, :timeout}` will be returned.
+
+
+  ## Node Pools
+
+  In order to avoid startup costs of initializing a full BEAM node and loading all of the necessary code onto it on each call,
+  `SafeNIF` implements a `NimblePool` based resource pool for [`:peer`](https://www.erlang.org/doc/apps/stdlib/peer.html) nodes,
+  allowing nodes to be reused across calls. By default, a pool is created with default values for idle time (5 minutes) and sizing
+  (based on `System.schedulers_online/0`). However, based on your demand, you may need to tune these values.
+  All benchmarks in SafeNIF were conducted with these defaults, but you can create your own pools and use them by passing in the `:pool`
+  option to `wrap/1` and `wrap/4`.
+
+  Creating a pool is as easy as adding `{SafeNIF, opts}` (where opts is a list of `t:pool_start_opt/0`) into your supervision tree, and customizing these options for your use case.
+
+  ### Node Pool Options
+    * `:name` (**required**) - An `t:atom/0` name to give to the pool.
+    * `:size` - How many workers to put in the pool. Defaults to `System.schedulers_online/0`.
+    * `:idle_timeout` - How long to allow the pool and nodes to be idle until we start scaling them down.
+
   """
   @spec wrap(runnable(), [wrap_opt()]) :: {:ok, term()} | {:error, term()}
   def wrap(runnable, opts \\ []) do
