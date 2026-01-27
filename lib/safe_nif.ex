@@ -3,8 +3,6 @@ defmodule SafeNIF do
   #{"./README.md" |> Path.expand() |> File.read!() |> String.split("<!-- README START -->") |> Enum.at(1) |> String.split("<!-- README END -->") |> List.first() |> String.trim()}
   """
 
-  alias SafeNIF.Runner
-
   @typedoc """
   Anything that is runnable. This may be a function, or an MFA tuple.
   """
@@ -52,36 +50,14 @@ defmodule SafeNIF do
     end
   end
 
-  defp do_wrap(runnable, timeout) do
-    ref = make_ref()
-    caller = self()
+  defguardp is_runnable(runnable)
+            when is_function(runnable, 0) or
+                   (is_tuple(runnable) and
+                      is_atom(elem(runnable, 0)) and
+                      is_atom(elem(runnable, 1)) and
+                      is_list(elem(runnable, 2)))
 
-    case DynamicSupervisor.start_child(SafeNIF.DynamicSupervisor, Runner.child_spec({ref, runnable, caller})) do
-      {:ok, pid} when is_pid(pid) -> wait(pid, ref, timeout)
-      {:error, {:already_started, pid}} when is_pid(pid) -> wait(pid, ref, timeout)
-      error -> error
-    end
-  end
-
-  defp wait(pid, ref, timeout) do
-    monitor_ref = Process.monitor(pid)
-
-    receive do
-      {^ref, :completed, result} ->
-        Process.demonitor(monitor_ref, [:flush])
-        {:ok, result}
-
-      {^ref, :crashed, {:error, result}} ->
-        Process.demonitor(monitor_ref, [:flush])
-        {:error, result}
-
-      {:DOWN, ^monitor_ref, :process, ^pid, reason} ->
-        {:error, reason}
-    after
-      timeout ->
-        Process.demonitor(monitor_ref, [:flush])
-        Process.exit(pid, :kill)
-        {:error, :timeout}
-    end
+  defp do_wrap(runnable, timeout) when is_runnable(runnable) do
+    SafeNIF.Pool.run(runnable, timeout: timeout)
   end
 end

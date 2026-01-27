@@ -79,6 +79,7 @@ defmodule SafeNIF.MixProject do
     [
       # Core Dependencies
       {:telemetry, "~> 1.0"},
+      {:nimble_pool, "~> 1.0"},
       ## Testing and Development Dependencies
       {:elixir_make, "~> 0.4", only: [:dev, :test], runtime: false},
       {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
