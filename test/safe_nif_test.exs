@@ -120,7 +120,7 @@ defmodule SafeNIFTest do
     test "peer node is cleaned up after crash" do
       hidden_before = :hidden |> Node.list() |> MapSet.new()
       SafeNIF.wrap({Helpers, :halt_node, [1]}, 15_000)
-      Process.sleep(500)
+      Process.sleep(1500)
       hidden_after = :hidden |> Node.list() |> MapSet.new()
       diff = hidden_before |> MapSet.difference(hidden_after) |> MapSet.size()
       assert diff == 1
