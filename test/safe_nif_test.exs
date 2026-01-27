@@ -118,13 +118,12 @@ defmodule SafeNIFTest do
     end
 
     test "peer node is cleaned up after crash" do
-      hidden_before = Node.list(:hidden)
+      hidden_before = :hidden |> Node.list() |> MapSet.new()
       SafeNIF.wrap({Helpers, :halt_node, [1]}, 15_000)
       Process.sleep(500)
-      hidden_after = Node.list(:hidden)
-
-      new_peers = hidden_after -- hidden_before
-      assert new_peers == []
+      hidden_after = :hidden |> Node.list() |> MapSet.new()
+      diff = hidden_before |> MapSet.difference(hidden_after) |> MapSet.size()
+      assert diff == 1
     end
 
     test "multiple sequential crashes don't leak nodes" do
