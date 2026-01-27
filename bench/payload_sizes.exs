@@ -76,10 +76,6 @@ case Helpers.setup() do
 
     Results saved to bench/results/payload_*.md
 
-    Key insights:
-      • Direct NIF is constant time (just returns the term)
-      • CLI Port overhead scales with payload (data through stdio + process spawn)
-      • SafeNIF overhead is dominated by node startup, payload is minor factor
     ================================================================================
     """)
 

@@ -55,14 +55,14 @@ by default, but you may want to commit significant baseline results.
 - Good for: Stateless operations, moderate throughput needs
 
 ### SafeNIF
-- **Peer node isolation** - Each call spawns a BEAM node
-- **Overhead**: BEAM startup + code loading + distribution
+- **Peer node isolation** - Each call runs on a `:peer` BEAM node
+- **Overhead**: Distribution and cold starts, pooling is lazy
 - Good for: Untrusted code, crashy NIFs, safety > speed
 
 ### When to Use What
 
-| Approach   | Use When                                                          |
-| ---------- | ----------------------------------------------------------------- |
-| Direct NIF | Trusted code, high performance needed, crashes acceptable         |
-| Port       | Moderate isolation needs, stateless ops, reasonable throughput    |
-| SafeNIF    | Untrusted code, must not crash main node, throughput not critical |
+| Approach   | Use When                                                       |
+| ---------- | -------------------------------------------------------------- |
+| Direct NIF | Trusted code, high performance needed, node crashes acceptable |
+| Port       | Moderate isolation needs, stateless ops                        |
+| SafeNIF    | Untrusted code, must not crash main node                       |

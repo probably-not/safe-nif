@@ -22,7 +22,7 @@ This benchmark compares execution overhead for three isolation strategies:
 
   • Direct NIF:  No isolation - crashes kill the node
   • CLI Port:    OS process isolation - spawns new process per call
-  • SafeNIF:     Peer node isolation - spawns new BEAM node per call
+  • SafeNIF:     Peer node isolation - spawns new BEAM nodes in a pool and each call is run on a separate BEAM node
 
 Both CLI Port and SafeNIF provide true isolation (fresh process per call).
 
@@ -76,11 +76,6 @@ case Helpers.setup() do
     Results saved to:
       • bench/results/noop_comparison.md
       • bench/results/add_comparison.md
-
-    Key insights:
-      • Direct NIF shows the baseline (no isolation overhead)
-      • CLI Port shows OS process spawn overhead (~1-10ms typical)
-      • SafeNIF shows BEAM node spawn overhead (~500-2000ms typical)
 
     Note: SafeNIF is designed for SAFETY, not speed. Use it when you need
     BEAM-level isolation (crash protection, code loading, distribution).
