@@ -10,6 +10,9 @@ defmodule SafeNIF do
 
   @type wrap_opt() :: {:timeout, timeout()} | {:pool_timeout, timeout()} | {:pool, atom()}
 
+  @doc false
+  defdelegate child_spec(args), to: SafeNIF.Pool
+
   @doc """
   Wrap a call in a way that will ensure that it cannot affect the current BEAM node.
 
