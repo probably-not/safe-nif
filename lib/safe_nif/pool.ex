@@ -42,13 +42,9 @@ defmodule SafeNIF.Pool do
     )
   end
 
-  def run(runnable, opts \\ []) do
-    run(__MODULE__, runnable, opts)
-  end
-
   def run(pool, runnable, opts) do
-    timeout = Keyword.get(opts, :timeout, 5_000)
-    pool_timeout = Keyword.get(opts, :pool_timeout, 5_000)
+    timeout = Keyword.get(opts, :timeout, to_timeout(second: 5))
+    pool_timeout = Keyword.get(opts, :pool_timeout, to_timeout(second: 5))
 
     try do
       NimblePool.checkout!(
@@ -62,6 +58,9 @@ defmodule SafeNIF.Pool do
     catch
       :exit, {:timeout, {NimblePool, :checkout, _}} ->
         {:error, :pool_timeout}
+
+      :exit, {:noproc, {NimblePool, :checkout, _}} ->
+        {:error, {:invalid_pool_name, pool}}
 
       :exit, reason ->
         {:error, reason}
