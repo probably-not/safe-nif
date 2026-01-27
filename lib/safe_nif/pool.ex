@@ -13,6 +13,10 @@ defmodule SafeNIF.Pool do
     defstruct [:activity_info, :pool_max_idle_time]
   end
 
+  def default_pool_name do
+    __MODULE__.Default
+  end
+
   @default_pool_size System.schedulers_online()
   @default_idle_timeout to_timeout(minute: 5)
 

@@ -8,6 +8,8 @@ defmodule SafeNIF do
   """
   @type runnable() :: (-> term()) | {module(), atom(), list()}
 
+  @type wrap_opt() :: {:timeout, timeout()} | {:pool_timeout, timeout()} | {:pool, atom()}
+
   @doc """
   Wrap a call in a way that will ensure that it cannot affect the current BEAM node.
 
@@ -22,13 +24,20 @@ defmodule SafeNIF do
 
   Should the function cause a crash, the reason will be wrapped in an error tuple and returned as `{:error, reason}`.
 
-  A timeout can be passed into the function, defaulting to 5 seconds. Should the function take longer than the given timeout
-  the underlying process will be force killed and `{:error, :timeout}` will be returned.
+  ## Options
+
+    * `:timeout` - A timeout to be passed into the function, defaulting to 5 seconds.
+      Should the function take longer than the given timeout the underlying process
+      will be force killed and `{:error, :timeout}` will be returned.
+    * `:pool` - A pool configured with custom values for size and idle node time.
+      Defaults to the default pool started up with the application.
+    * `:pool_timeout` - A timeout for how long it should take to checkout a node from the pool, defaulting to 5 seconds.
+      Should the pool checkout take longer than the given timeout `{:error, :timeout}` will be returned.
   """
-  @spec wrap(runnable(), timeout()) :: {:ok, term()} | {:error, term()}
-  def wrap(runnable, timeout \\ to_timeout(second: 5)) do
+  @spec wrap(runnable(), [wrap_opt()]) :: {:ok, term()} | {:error, term()}
+  def wrap(runnable, opts \\ []) do
     if Node.alive?() do
-      do_wrap(runnable, timeout)
+      do_wrap(runnable, opts)
     else
       {:error, :not_alive}
     end
@@ -41,10 +50,10 @@ defmodule SafeNIF do
 
   See `wrap/1` for more details.
   """
-  @spec wrap(module(), atom(), list(), timeout()) :: {:ok, term()} | {:error, term()}
-  def wrap(mod, fun, args, timeout \\ to_timeout(second: 5)) when is_atom(mod) and is_atom(fun) and is_list(args) do
+  @spec wrap(module(), atom(), list(), [wrap_opt()]) :: {:ok, term()} | {:error, term()}
+  def wrap(mod, fun, args, opts \\ []) when is_atom(mod) and is_atom(fun) and is_list(args) do
     if Node.alive?() do
-      do_wrap({mod, fun, args}, timeout)
+      do_wrap({mod, fun, args}, opts)
     else
       {:error, :not_alive}
     end
@@ -57,7 +66,15 @@ defmodule SafeNIF do
                       is_atom(elem(runnable, 1)) and
                       is_list(elem(runnable, 2)))
 
-  defp do_wrap(runnable, timeout) when is_runnable(runnable) do
-    SafeNIF.Pool.run(runnable, timeout: timeout)
+  defp do_wrap(runnable, timeout) when is_runnable(runnable) and is_integer(timeout) do
+    # For now, we're going to manually catch this, so that people won't be affected.
+    # But, it is deprecated... so it should be removed eventually.
+    do_wrap(runnable, timeout: timeout)
+  end
+
+  defp do_wrap(runnable, opts) when is_runnable(runnable) do
+    opts = Keyword.validate!(opts, [:timeout, :pool_timeout, pool: SafeNIF.Pool.default_pool_name()])
+    {pool, opts} = Keyword.pop!(opts, :pool)
+    SafeNIF.Pool.run(pool, runnable, opts)
   end
 end
