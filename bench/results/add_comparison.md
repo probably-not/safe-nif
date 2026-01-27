@@ -1,6 +1,6 @@
 Benchmark
 
-Benchmark run from 2026-01-26 12:44:14.436578Z UTC
+Benchmark run from 2026-01-27 13:24:45.228184Z UTC
 
 ## System
 
@@ -63,29 +63,29 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">Direct NIF (unsafe)</td>
-    <td style="white-space: nowrap; text-align: right">21573060.08</td>
-    <td style="white-space: nowrap; text-align: right">0.00005 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;85.77%</td>
-    <td style="white-space: nowrap; text-align: right">0.00004 ms</td>
-    <td style="white-space: nowrap; text-align: right">0.00008 ms</td>
-  </tr>
-
-  <tr>
-    <td style="white-space: nowrap">CLI Port</td>
-    <td style="white-space: nowrap; text-align: right">577.30</td>
-    <td style="white-space: nowrap; text-align: right">1.73 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;32.38%</td>
-    <td style="white-space: nowrap; text-align: right">1.62 ms</td>
-    <td style="white-space: nowrap; text-align: right">3.21 ms</td>
+    <td style="white-space: nowrap; text-align: right">53.10 M</td>
+    <td style="white-space: nowrap; text-align: right">0.00002 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;1573.62%</td>
+    <td style="white-space: nowrap; text-align: right">0.00002 ms</td>
+    <td style="white-space: nowrap; text-align: right">0.00003 ms</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">SafeNIF</td>
-    <td style="white-space: nowrap; text-align: right">3.81</td>
-    <td style="white-space: nowrap; text-align: right">262.35 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;10.51%</td>
-    <td style="white-space: nowrap; text-align: right">255.76 ms</td>
-    <td style="white-space: nowrap; text-align: right">328.78 ms</td>
+    <td style="white-space: nowrap; text-align: right">0.0133 M</td>
+    <td style="white-space: nowrap; text-align: right">0.0752 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;81.06%</td>
+    <td style="white-space: nowrap; text-align: right">0.0673 ms</td>
+    <td style="white-space: nowrap; text-align: right">0.184 ms</td>
+  </tr>
+
+  <tr>
+    <td style="white-space: nowrap">CLI Port</td>
+    <td style="white-space: nowrap; text-align: right">0.00060 M</td>
+    <td style="white-space: nowrap; text-align: right">1.68 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;8.18%</td>
+    <td style="white-space: nowrap; text-align: right">1.64 ms</td>
+    <td style="white-space: nowrap; text-align: right">2.15 ms</td>
   </tr>
 
 </table>
@@ -100,20 +100,20 @@ Run Time Comparison
     <th style="text-align: right">Slower</th>
   <tr>
     <td style="white-space: nowrap">Direct NIF (unsafe)</td>
-    <td style="white-space: nowrap;text-align: right">21573060.08</td>
+    <td style="white-space: nowrap;text-align: right">53.10 M</td>
     <td>&nbsp;</td>
   </tr>
 
   <tr>
-    <td style="white-space: nowrap">CLI Port</td>
-    <td style="white-space: nowrap; text-align: right">577.30</td>
-    <td style="white-space: nowrap; text-align: right">37369.08x</td>
+    <td style="white-space: nowrap">SafeNIF</td>
+    <td style="white-space: nowrap; text-align: right">0.0133 M</td>
+    <td style="white-space: nowrap; text-align: right">3991.89x</td>
   </tr>
 
   <tr>
-    <td style="white-space: nowrap">SafeNIF</td>
-    <td style="white-space: nowrap; text-align: right">3.81</td>
-    <td style="white-space: nowrap; text-align: right">5659618.74x</td>
+    <td style="white-space: nowrap">CLI Port</td>
+    <td style="white-space: nowrap; text-align: right">0.00060 M</td>
+    <td style="white-space: nowrap; text-align: right">89174.48x</td>
   </tr>
 
 </table>
@@ -134,13 +134,13 @@ Memory Usage
     <td>&nbsp;</td>
   </tr>
     <tr>
-    <td style="white-space: nowrap">CLI Port</td>
-    <td style="white-space: nowrap">4072 B</td>
+    <td style="white-space: nowrap">SafeNIF</td>
+    <td style="white-space: nowrap">552 B</td>
     <td>&mdash;</td>
   </tr>
     <tr>
-    <td style="white-space: nowrap">SafeNIF</td>
-    <td style="white-space: nowrap">696 B</td>
+    <td style="white-space: nowrap">CLI Port</td>
+    <td style="white-space: nowrap">4072 B</td>
     <td>&mdash;</td>
   </tr>
 </table>
@@ -161,13 +161,13 @@ Reduction Count
     <td>&nbsp;</td>
   </tr>
     <tr>
-    <td style="white-space: nowrap">CLI Port</td>
-    <td style="white-space: nowrap">329</td>
+    <td style="white-space: nowrap">SafeNIF</td>
+    <td style="white-space: nowrap">76.89</td>
     <td>&mdash;</td>
   </tr>
     <tr>
-    <td style="white-space: nowrap">SafeNIF</td>
-    <td style="white-space: nowrap">86</td>
+    <td style="white-space: nowrap">CLI Port</td>
+    <td style="white-space: nowrap">329</td>
     <td>&mdash;</td>
   </tr>
 </table>
