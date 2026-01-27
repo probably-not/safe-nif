@@ -31,8 +31,11 @@ defmodule SafeNIF do
     * `:name` (**required**) - An `t:atom/0` name to give to the pool.
     * `:size` - How many workers to put in the pool. Defaults to `System.schedulers_online/0`.
     * `:idle_timeout` - How long to allow the pool and nodes to be idle until we start scaling them down.
+    * `:peer_applications` - A list of applications to start on the peer node, defaulting to just `:safe_nif`.
+      If you need a custom list of applications that must start on the peer node, make sure to pass their names into the pool.
   """
-  @type pool_start_opt() :: {:name, atom()} | {:size, pos_integer()} | {:idle_timeout, timeout()}
+  @type pool_start_opt() ::
+          {:name, atom()} | {:size, pos_integer()} | {:idle_timeout, timeout()} | {:peer_applications, [atom()]}
 
   @doc false
   defdelegate child_spec(args), to: SafeNIF.Pool
@@ -77,6 +80,8 @@ defmodule SafeNIF do
     * `:name` (**required**) - An `t:atom/0` name to give to the pool.
     * `:size` - How many workers to put in the pool. Defaults to `System.schedulers_online/0`.
     * `:idle_timeout` - How long to allow the pool and nodes to be idle until we start scaling them down.
+    * `:peer_applications` - A list of applications to start on the peer node, defaulting to just `:safe_nif`.
+      If you need a custom list of applications that must start on the peer node, make sure to pass their names into the pool.
 
   """
   @spec wrap(runnable(), [wrap_opt()]) :: {:ok, term()} | {:error, term()}

@@ -10,7 +10,8 @@ defmodule SafeNIF.Pool do
 
   defmodule State do
     @moduledoc false
-    defstruct [:activity_info, :pool_max_idle_time]
+    @enforce_keys [:activity_info, :pool_max_idle_time, :peer_applications]
+    defstruct [:activity_info, :pool_max_idle_time, :peer_applications]
   end
 
   def default_pool_name do
@@ -69,14 +70,22 @@ defmodule SafeNIF.Pool do
   @impl NimblePool
   def init_pool(opts) do
     idle_timeout = Keyword.get(opts, :idle_timeout, @default_idle_timeout)
-    pool_state = %__MODULE__.State{activity_info: init_activity_info(), pool_max_idle_time: idle_timeout}
+    peer_applications = Keyword.get(opts, :peer_applications, [:safe_nif])
+
+    pool_state = %__MODULE__.State{
+      activity_info: init_activity_info(),
+      pool_max_idle_time: idle_timeout,
+      peer_applications: peer_applications
+    }
+
     {:ok, pool_state}
   end
 
   @impl NimblePool
   def init_worker(%__MODULE__.State{} = pool_state) do
     pool_pid = self()
-    async = fn -> start_peer(pool_pid) end
+    peer_applications = pool_state.peer_applications
+    async = fn -> start_peer(pool_pid, peer_applications) end
     {:async, async, pool_state}
   end
 
@@ -212,7 +221,7 @@ defmodule SafeNIF.Pool do
     Node.spawn_monitor(peer, WrappedCall.call(caller, runnable))
   end
 
-  defp start_peer(pool_pid) do
+  defp start_peer(pool_pid, peer_applications) do
     node_name = :peer.random_name()
     caller = self()
 
@@ -232,7 +241,7 @@ defmodule SafeNIF.Pool do
 
     add_code_paths(peer)
     transfer_configuration(peer)
-    ensure_apps_started(peer)
+    ensure_apps_started(peer, peer_applications)
     send(pool_pid, {:link_controller, peer})
     %__MODULE__{node: peer, controller_pid: controller_pid, last_checkin: System.monotonic_time()}
   end
@@ -255,10 +264,8 @@ defmodule SafeNIF.Pool do
     end)
   end
 
-  defp ensure_apps_started(node) do
-    started_names = Enum.map(Application.started_applications(), fn {name, _, _} -> name end)
-
-    Enum.reduce(started_names, MapSet.new(), fn app, started ->
+  defp ensure_apps_started(node, peer_applications) do
+    Enum.reduce(peer_applications, MapSet.new(), fn app, started ->
       maybe_start_app(node, app, started)
     end)
   end

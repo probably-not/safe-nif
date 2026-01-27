@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1] - 2026-01-27
+
+### Added
+
+- `:peer_applications` - For custom pools, you can decide which applications will be started on the peer nodes. In the default pool this defaults to only `:safe_nif`, and if not passed in to custom pools it will default to `:safe_nif` as well
+
 ## [0.2.0] - 2026-01-27
 
 Pooling `:peer` nodes has been implemented!
