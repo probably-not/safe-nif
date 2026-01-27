@@ -137,7 +137,7 @@ defmodule SafeNIFTest do
 
       hidden_after = Node.list(:hidden)
       new_peers = hidden_after -- hidden_before
-      assert length(new_peers) <= System.schedulers_online() - 5
+      assert length(new_peers) <= max(System.schedulers_online() - 5, 0)
     end
 
     test "main node services continue working after peer crash" do
