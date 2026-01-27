@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0] - 2026-01-27
+
+Pooling `:peer` nodes has been implemented!
+You now no longer incur the startup costs of nodes on every call, instead, you only incur them on the first call.
+
+### Breaking Changes
+- `SafeNIF.wrap/1` and `SafeNIF.wrap/4` now receive a `t:Keyword.t/0` as their last parameter instead of a timeout directly. This is in order to allow us to pass details like the pool name (if you have a custom pool), and details related to timeouts of the pool.
+
+### Notes
+
+Pooled `:peer` nodes are implemented with the following details:
+- They are lazily created, so they will not start up until the first call.
+- They are killed if they are idle, to ensure that when they are not in use they will scale in.
+
 ## [0.1.1] - 2026-01-27
 
 Minor fixes to the documentation.
