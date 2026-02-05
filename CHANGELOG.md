@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0] - 2026-02-05
+
+`SafeNIF` now detects whether or not you are in a release, and will automatically use your current release's `start_clean.boot` bootfile in order to start up the `:peer` node. This ensures that `SafeNIF` can work properly with Elixir's mix release system, something that I unfortunately fully didn't test out before pushing this out to production.
+
+### Added
+
+- `:peer_applications` - For custom pools, you can decide which applications will be started on the peer nodes. In the default pool this defaults to only `:safe_nif`, and if not passed in to custom pools it will default to `:safe_nif` as well
+
 ## [0.2.1] - 2026-01-27
 
 ### Added
