@@ -276,8 +276,8 @@ defmodule SafeNIF.Pool do
       raise RuntimeError, """
       The current running node was detected to be part of a mix release,
       with the `RELEASE_ROOT` environment variable set to
-      #{System.get_env("RELEASE_ROOT")} and the `RELEASE_VSN` environment
-      variable set to #{System.get_env("RELEASE_VSN")}.
+      #{release_root} and the `RELEASE_VSN` environment
+      variable set to #{release_vsn}.
 
       We tried to load the `start_clean` bootfile from #{boot_file},
       but this file does not exist.
