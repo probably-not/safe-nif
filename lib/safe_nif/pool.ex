@@ -229,7 +229,7 @@ defmodule SafeNIF.Pool do
       :peer.start_link(%{
         name: node_name,
         wait_boot: {caller, :peer_ready},
-        args: [~c"-hidden"]
+        args: peer_args()
       })
 
     peer =
@@ -244,6 +244,56 @@ defmodule SafeNIF.Pool do
     ensure_apps_started(peer, peer_applications)
     send(pool_pid, {:link_controller, peer})
     %__MODULE__{node: peer, controller_pid: controller_pid, last_checkin: System.monotonic_time()}
+  end
+
+  defp peer_args do
+    args = [~c"-hidden"]
+    args = maybe_add_cookie_args(args)
+    in_release? = System.get_env("RELEASE_ROOT") != nil
+
+    if in_release? do
+      add_release_boot!(args)
+    else
+      args
+    end
+  end
+
+  defp maybe_add_cookie_args(args) do
+    case Node.get_cookie() do
+      :nocookie -> args
+      cookie -> [~c"-setcookie", Atom.to_charlist(cookie) | args]
+    end
+  end
+
+  defp add_release_boot!(args) do
+    release_root = System.fetch_env!("RELEASE_ROOT")
+    release_vsn = System.fetch_env!("RELEASE_VSN")
+
+    boot_path = Path.join([release_root, "releases", release_vsn, "start_clean"])
+    boot_file = boot_path <> ".boot"
+
+    if not File.exists?(boot_file) do
+      raise RuntimeError, """
+      The current running node was detected to be part of a mix release,
+      with the `RELEASE_ROOT` environment variable set to
+      #{System.get_env("RELEASE_ROOT")} and the `RELEASE_VSN` environment
+      variable set to #{System.get_env("RELEASE_VSN")}.
+
+      We tried to load the `start_clean` bootfile from #{boot_file},
+      but this file does not exist.
+      """
+    end
+
+    release_lib = Path.join(release_root, "lib")
+
+    [
+      ~c"-boot",
+      String.to_charlist(boot_path),
+      ~c"-boot_var",
+      ~c"RELEASE_LIB",
+      String.to_charlist(release_lib)
+      | args
+    ]
   end
 
   defp rpc(node, module, function, args) do
