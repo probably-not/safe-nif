@@ -1,12 +1,14 @@
 # Changelog
 
+## [0.4.0] - 2026-02-11
+
+`SafeNIF` pools are now correctly cleaned up, instead of being terminated. My original pool implementation was essentially a copy of [Finch's HTTP1.Pool module](https://github.com/sneako/finch/blob/main/lib/finch/http1/pool.ex) just replaced with functionality that initialized peer nodes and handled everything lazily. However, I made a mistake in copying the `handle_ping` callback. Finch's `handle_ping` will shut down the entire pool if the pool is idle. For Finch, this is fine, since the rest of Finch will ensure that pools are started for hosts and the like, but for `SafeNIF` this is very bad - because pools will die off when they shouldn't.
+
+This release ensures that the restart option for the pool is set to `:permanent`, and removes all of the copied Finch code with activity handling, timeout handling, and full pool stopping, and replaces it with simple ping removal - when a worker is pinged as idle, we remove it from the pool.
+
 ## [0.3.0] - 2026-02-05
 
 `SafeNIF` now detects whether or not you are in a release, and will automatically use your current release's `start_clean.boot` bootfile in order to start up the `:peer` node. This ensures that `SafeNIF` can work properly with Elixir's mix release system, something that I unfortunately fully didn't test out before pushing this out to production.
-
-### Added
-
-- `:peer_applications` - For custom pools, you can decide which applications will be started on the peer nodes. In the default pool this defaults to only `:safe_nif`, and if not passed in to custom pools it will default to `:safe_nif` as well
 
 ## [0.2.1] - 2026-01-27
 
