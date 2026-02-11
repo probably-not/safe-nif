@@ -24,7 +24,7 @@ defmodule SafeNIF.Pool do
     %{
       id: Keyword.get(opts, :name, __MODULE__),
       start: {__MODULE__, :start_link, [opts]},
-      restart: :transient
+      restart: :permanent
     }
   end
 
