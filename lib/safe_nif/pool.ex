@@ -10,8 +10,8 @@ defmodule SafeNIF.Pool do
 
   defmodule State do
     @moduledoc false
-    @enforce_keys [:activity_info, :pool_max_idle_time, :peer_applications]
-    defstruct [:activity_info, :pool_max_idle_time, :peer_applications]
+    @enforce_keys [:peer_applications]
+    defstruct [:peer_applications]
   end
 
   def default_pool_name do
@@ -69,15 +69,8 @@ defmodule SafeNIF.Pool do
 
   @impl NimblePool
   def init_pool(opts) do
-    idle_timeout = Keyword.get(opts, :idle_timeout, @default_idle_timeout)
     peer_applications = Keyword.get(opts, :peer_applications, [:safe_nif])
-
-    pool_state = %__MODULE__.State{
-      activity_info: init_activity_info(),
-      pool_max_idle_time: idle_timeout,
-      peer_applications: peer_applications
-    }
-
+    pool_state = %__MODULE__.State{peer_applications: peer_applications}
     {:ok, pool_state}
   end
 
@@ -94,30 +87,30 @@ defmodule SafeNIF.Pool do
     idle_time = System.monotonic_time() - worker.last_checkin
 
     case Node.ping(worker.node) do
-      :pong -> {:ok, {worker.node, idle_time}, worker, update_activity_info(:checkout, pool_state)}
+      :pong -> {:ok, {worker.node, idle_time}, worker, pool_state}
       :pang -> {:remove, :nodedown, pool_state}
     end
   end
 
   @impl NimblePool
   def handle_checkin({:error, :nodedown}, _from, _worker, %__MODULE__.State{} = pool_state) do
-    {:remove, :nodedown, update_activity_info(:checkin, pool_state)}
+    {:remove, :nodedown, pool_state}
   end
 
   @impl NimblePool
   def handle_checkin({:error, :noproc}, _from, _worker, %__MODULE__.State{} = pool_state) do
-    {:remove, :noproc, update_activity_info(:checkin, pool_state)}
+    {:remove, :noproc, pool_state}
   end
 
   @impl NimblePool
   def handle_checkin({:error, :noconnection}, _from, _worker, %__MODULE__.State{} = pool_state) do
-    {:remove, :noconnection, update_activity_info(:checkin, pool_state)}
+    {:remove, :noconnection, pool_state}
   end
 
   @impl NimblePool
   def handle_checkin(_checkin_state, _from, %__MODULE__{} = worker, %__MODULE__.State{} = pool_state) do
     worker = %{worker | last_checkin: System.monotonic_time()}
-    {:ok, worker, update_activity_info(:checkin, pool_state)}
+    {:ok, worker, pool_state}
   end
 
   @impl NimblePool
@@ -149,21 +142,8 @@ defmodule SafeNIF.Pool do
   end
 
   @impl NimblePool
-  def handle_ping(%__MODULE__{} = worker, %__MODULE__.State{} = pool_state) do
-    %__MODULE__.State{pool_max_idle_time: max_idle_time, activity_info: activity_info} = pool_state
-    now = System.monotonic_time(:millisecond)
-    diff_from_last_checkout = now - activity_info.last_checkout_ts
-
-    is_idle? = diff_from_last_checkout > max_idle_time
-    max_idle_time_configured? = is_number(max_idle_time)
-    any_connection_in_use? = activity_info.in_use_count > 0
-
-    cond do
-      not max_idle_time_configured? -> {:ok, worker}
-      any_connection_in_use? -> {:ok, worker}
-      is_idle? -> {:stop, :idle_timeout}
-      true -> {:ok, worker}
-    end
+  def handle_ping(%__MODULE__{} = _worker, %__MODULE__.State{} = _pool_state) do
+    {:remove, :idle_timeout}
   end
 
   @impl NimblePool
@@ -329,19 +309,5 @@ defmodule SafeNIF.Pool do
         {:error, _reason} -> started
       end
     end
-  end
-
-  defp init_activity_info do
-    %{in_use_count: 0, last_checkout_ts: System.monotonic_time(:millisecond)}
-  end
-
-  defp update_activity_info(:checkout, pool_state) do
-    update_in(pool_state.activity_info, fn %{in_use_count: count} ->
-      %{in_use_count: count + 1, last_checkout_ts: System.monotonic_time(:millisecond)}
-    end)
-  end
-
-  defp update_activity_info(:checkin, pool_state) do
-    update_in(pool_state.activity_info.in_use_count, &max(&1 - 1, 0))
   end
 end
