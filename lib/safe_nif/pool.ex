@@ -147,9 +147,9 @@ defmodule SafeNIF.Pool do
   end
 
   @impl NimblePool
-  def terminate_worker(_reason, %__MODULE__{node: peer}, pool_state) do
+  def terminate_worker(_reason, %__MODULE__{controller_pid: controller_pid}, pool_state) do
     try do
-      :peer.stop(peer)
+      :peer.stop(controller_pid)
     catch
       :exit, _ -> :ok
     end
