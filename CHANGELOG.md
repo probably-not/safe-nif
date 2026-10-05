@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.1] - 2026-10-05
+
+This release includes a fix to a leak of workers that is caused by `:peer` node worker removal. The `:peer.stop` function expects not the actual peer node, but the controller pid instead.
+
 ## [0.4.0] - 2026-02-11
 
 `SafeNIF` pools are now correctly cleaned up, instead of being terminated. My original pool implementation was essentially a copy of [Finch's HTTP1.Pool module](https://github.com/sneako/finch/blob/main/lib/finch/http1/pool.ex) just replaced with functionality that initialized peer nodes and handled everything lazily. However, I made a mistake in copying the `handle_ping` callback. Finch's `handle_ping` will shut down the entire pool if the pool is idle. For Finch, this is fine, since the rest of Finch will ensure that pools are started for hosts and the like, but for `SafeNIF` this is very bad - because pools will die off when they shouldn't.
